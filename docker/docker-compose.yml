@@ -1,0 +1,61 @@
+version: "3"
+services:
+  typo3_nginx:
+    image: typo3_nginx:${BRANCH-local}
+    build:
+      context: ./../
+      dockerfile: ./docker/containers/typo3_nginx/Dockerfile
+    restart: on-failure
+    ports:
+      - 80:80
+    networks:
+      - frontend
+    depends_on:
+      - typo3_api
+  php_base:
+    image: php_base
+    build:
+      context: ./../
+      dockerfile: ./docker/containers/php/base/Dockerfile
+    restart: on-failure
+    networks:
+      - frontend
+  php_runtime:
+    image: php_runtime
+    build:
+      context: ./../
+      dockerfile: ./docker/containers/php/environment/production/Dockerfile
+    restart: on-failure
+    networks:
+      - frontend
+    depends_on:
+      - php_base
+  typo3_api:
+    image: typo3_api:${BRANCH-local}
+    build:
+      context: ./../
+      dockerfile: ./docker/containers/php/typo3_api/Dockerfile
+    restart: on-failure
+    networks:
+      - frontend
+    depends_on:
+      - php_runtime
+  mariadb:
+    image: mariadb:10.2
+    networks:
+      - frontend
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: typo3Site
+      MYSQL_DATABASE: typo3Site
+      MYSQL_USER: typo3Site
+      MYSQL_PASSWORD: typo3Site
+      MYSQL_ROOT_HOST: "%"
+    restart: on-failure
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    volumes:
+      - /var/mariadb:/var/lib/mysql
+networks:
+  frontend:
+    driver: bridge

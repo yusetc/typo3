@@ -1,0 +1,8 @@
+version: "3"
+services:
+  php_runtime:
+    build:
+      context: ./../	
+      dockerfile: ./docker/containers/php/environment/production/Dockerfile
+    environment:
+      APP_ENV: "prod"

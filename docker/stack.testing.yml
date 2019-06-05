@@ -1,0 +1,36 @@
+version: "3.4"
+services:
+  sk_nginx:
+    image: 088242704549.dkr.ecr.eu-central-1.amazonaws.com/standskizzenservice/sk_nginx:##branch##
+    networks:
+      - standskizzenservice
+      - proxy_#random#
+    environment:
+      APP_ENV: "testing"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      labels:
+        com.df.serviceDomain: "##testing_host##"
+        com.df.notify: "true"
+        com.df.servicePath: "/"
+        com.df.port: "80"
+  sk_api:
+    image: 088242704549.dkr.ecr.eu-central-1.amazonaws.com/standskizzenservice/sk_api:##branch##
+    environment:
+      APP_ENV: "testing"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    networks:
+      - standskizzenservice
+    extra_hosts:
+        fileservice.tools.giffits.de: 3.121.158.174
+networks:
+  standskizzenservice:
+    driver: overlay
+    external: false
+  proxy_#random#:
+    external: true

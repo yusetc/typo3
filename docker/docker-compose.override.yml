@@ -1,0 +1,14 @@
+version: "3"
+services:
+  typo3_nginx:
+    volumes:
+      - ./../api:/var/www/api
+      - ./containers/typo3_nginx/conf.d:/etc/nginx/conf.d
+  php_runtime:
+    build:
+      dockerfile: ./docker/containers/php/environment/development/Dockerfile
+    environment:
+      APP_ENV: "prod"
+  typo3_api:
+    volumes:
+      - ./../api:/var/www/api
